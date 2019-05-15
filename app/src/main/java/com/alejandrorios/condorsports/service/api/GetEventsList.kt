@@ -16,17 +16,17 @@ class GetEventsList : TeamDetailsActivityView.GetEventsInteractor {
         onFinishedListener: TeamDetailsActivityView.GetEventsInteractor.OnFinishedListener
     ) {
         val service: RetrofitProvider = RetrofitProviderImpl.retrofit.create()
-        val call: Call<Events> = service.getEventsByTeam(teamId)
-
-        call.enqueue(object : Callback<Events> {
-            override fun onResponse(call: Call<Events>, response: Response<Events>) {
-                response.body()?.let { onFinishedListener.onFinished(it) }
-            }
-
-            override fun onFailure(call: Call<Events>, t: Throwable) {
-                onFinishedListener.onFailure(t)
-            }
-
-        })
+//        val call: Call<Events> = service.getEventsByTeam(teamId)
+//
+//        call.enqueue(object : Callback<Events> {
+//            override fun onResponse(call: Call<Events>, response: Response<Events>) {
+//                response.body()?.let { onFinishedListener.onFinished(it) }
+//            }
+//
+//            override fun onFailure(call: Call<Events>, t: Throwable) {
+//                onFinishedListener.onFailure(t)
+//            }
+//
+//        })
     }
 }

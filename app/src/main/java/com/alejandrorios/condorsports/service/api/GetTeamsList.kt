@@ -1,12 +1,12 @@
 package com.alejandrorios.condorsports.service.api
 
-import com.alejandrorios.condorsports.models.Team
 import com.alejandrorios.condorsports.service.network.RetrofitProvider
 import com.alejandrorios.condorsports.service.network.RetrofitProviderImpl
 import com.alejandrorios.condorsports.ui.mainActivity.MainActivityView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.create
 
 class GetTeamsList : MainActivityView.GetTeamsInteractor {
@@ -16,17 +16,22 @@ class GetTeamsList : MainActivityView.GetTeamsInteractor {
         onFinishedListener: MainActivityView.GetTeamsInteractor.OnFinishedListener
     ) {
         val service: RetrofitProvider = RetrofitProviderImpl.retrofit.create()
-        val call: Call<Team> = service.getTeamByLeague(codeLeague)
 
-        call.enqueue(object : Callback<Team> {
-            override fun onResponse(call: Call<Team>, response: Response<Team>) {
-                response.body()?.let { onFinishedListener.onFinished(it) }
+        CoroutineScope(Dispatchers.IO).launch {
+            val request = service.getTeamByLeague(codeLeague)
+            withContext(Dispatchers.IO) {
+                try {
+                    val response = request.await()
+                    if (response.isSuccessful) {
+                        response.body()?.let { onFinishedListener.onFinished(it) }
+                    } else {
+                        response.errorBody().let { onFinishedListener.onFailure(Throwable(it.toString())) }
+                    }
+                } catch (e: Throwable) {
+                    onFinishedListener.onFailure(Throwable(e))
+                    e.printStackTrace()
+                }
             }
-
-            override fun onFailure(call: Call<Team>, t: Throwable) {
-                onFinishedListener.onFailure(t)
-            }
-
-        })
+        }
     }
 }

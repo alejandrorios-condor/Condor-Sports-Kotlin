@@ -21,18 +21,14 @@ class MainActivityPresenter(
     }
 
     override fun onFinished(teamList: Team) {
-        mainActivity.apply {
-            showProgress(false)
-            teamList.data?.let { RealmManager.instance.saveList(it, TeamData::class.java) }
-            teamList.data?.let { setupTeamsList(it) }
-        }
+        mainActivity.showProgress(false)
+        teamList.data?.let { RealmManager.instance.saveList(it, TeamData::class.java) }
+        teamList.data?.let { mainActivity.setupTeamsList(it) }
     }
 
     override fun onFailure(t: Throwable) {
-        mainActivity.apply {
-            showProgress(false)
-            showMsg(true)
-        }
+        mainActivity.showProgress(false)
+        mainActivity.showMsg(true)
     }
 
     override fun onTeamClicked(team: TeamData?) {

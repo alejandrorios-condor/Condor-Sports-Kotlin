@@ -20,11 +20,8 @@ class TeamListAdapter(private var teamsList: List<TeamData>) : Adapter<TeamListA
 
     var delegate: Delegate? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TeamHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.item_team, parent, false)
-
-        return TeamHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TeamHolder =
+        TeamHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_team, parent, false))
 
     override fun getItemCount() = teamsList.size
 
