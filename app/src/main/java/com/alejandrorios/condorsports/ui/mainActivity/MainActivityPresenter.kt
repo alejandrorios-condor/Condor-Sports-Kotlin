@@ -1,27 +1,24 @@
 package com.alejandrorios.condorsports.ui.mainActivity
 
-import android.content.Context
-import android.content.Intent
 import com.alejandrorios.condorsports.adapters.TeamListAdapter
 import com.alejandrorios.condorsports.common.RealmManager
 import com.alejandrorios.condorsports.models.Team
 import com.alejandrorios.condorsports.models.TeamData
-import com.alejandrorios.condorsports.ui.teamDetails.TeamDetailsActivity
+import com.alejandrorios.condorsports.service.api.TeamsInteractor
 import com.google.gson.Gson
 
 class MainActivityPresenter(
-    private val context: Context,
-    private val mainActivity: MainActivityView,
-    private val teamsData: MainActivityView.GetTeamsInteractor
-) : MainActivityView.Presenter, MainActivityView.GetTeamsInteractor.OnFinishedListener, TeamListAdapter.Delegate {
+    private var mainActivity: MainActivityView?,
+    private val teamsInteractor: TeamsInteractor
+) : MainActivityView.Presenter, TeamsInteractor.OnTeamFinishedListener, TeamListAdapter.Delegate {
 
     override fun getTeamsList(leagueCode: String) {
-        mainActivity.showProgress(true)
-        teamsData.getTeamsList(leagueCode, this)
+        mainActivity?.showProgress(true)
+        teamsInteractor.getTeamsList(leagueCode, this)
     }
 
-    override fun onFinished(teamList: Team) {
-        mainActivity.apply {
+    override fun onSuccess(teamList: Team) {
+        mainActivity?.apply {
             showProgress(false)
             teamList.data?.let { RealmManager.instance.saveList(it, TeamData::class.java) }
             teamList.data?.let { setupTeamsList(it) }
@@ -29,21 +26,19 @@ class MainActivityPresenter(
     }
 
     override fun onFailure(t: Throwable) {
-        mainActivity.apply {
+        mainActivity?.apply {
             showProgress(false)
             showMsg(true)
         }
     }
 
     override fun onTeamClicked(team: TeamData?) {
-        val intent = Intent(context, TeamDetailsActivity::class.java)
         val teamJson: String = Gson().toJson(team)
 
-        intent.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            putExtra("teamData", teamJson)
-        }
+        mainActivity?.showTeamDetails(teamJson)
+    }
 
-        context.startActivity(intent)
+    fun onDestroy() {
+        mainActivity = null
     }
 }

@@ -9,20 +9,11 @@ interface MainActivityView{
         fun getTeamsList(leagueCode: String)
     }
 
-    interface GetTeamsInteractor {
-
-        interface OnFinishedListener {
-            fun onFinished(teamList: Team)
-
-            fun onFailure(t: Throwable)
-        }
-
-        fun getTeamsList(codeLeague: String, onFinishedListener: OnFinishedListener)
-    }
-
     fun setupTeamsList(teams: List<TeamData>)
 
     fun showProgress(show: Boolean)
 
     fun showMsg(show: Boolean)
+
+    fun showTeamDetails(teamJson: String)
 }

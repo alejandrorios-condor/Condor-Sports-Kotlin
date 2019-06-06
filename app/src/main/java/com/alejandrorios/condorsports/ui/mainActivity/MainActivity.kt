@@ -2,10 +2,10 @@ package com.alejandrorios.condorsports.ui.mainActivity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.support.v7.widget.Toolbar
@@ -19,7 +19,8 @@ import com.alejandrorios.condorsports.R
 import com.alejandrorios.condorsports.adapters.TeamListAdapter
 import com.alejandrorios.condorsports.common.SpacesItemDecoration
 import com.alejandrorios.condorsports.models.TeamData
-import com.alejandrorios.condorsports.service.api.GetTeamsList
+import com.alejandrorios.condorsports.service.api.TeamsInteractor
+import com.alejandrorios.condorsports.ui.teamDetails.TeamDetailsActivity
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
     lateinit var txtTeamsEmpty: TextView
 
     private var teamsList: List<TeamData>? = null
-    private var presenter: MainActivityPresenter? = null
+    private var presenter = MainActivityPresenter(this, TeamsInteractor())
     private var teamAdapter: TeamListAdapter? = null
     private var decoration = SpacesItemDecoration(16)
 
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
 
         setSupportActionBar(toolbar)
 
-        presenter = MainActivityPresenter(applicationContext, this, GetTeamsList())
         presenter!!.getTeamsList(getString(R.string.spanish_league_code))
     }
 
@@ -140,5 +140,21 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
         teamsList = emptyList()
         rvTeamsList.removeItemDecoration(decoration)
         teamAdapter!!.notifyDataSetChanged()
+    }
+
+    override fun showTeamDetails(teamJson: String) {
+        val intent = Intent(applicationContext, TeamDetailsActivity::class.java)
+
+        intent.apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra("teamData", teamJson)
+        }
+
+        applicationContext.startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        presenter?.onDestroy()
+        super.onDestroy()
     }
 }
