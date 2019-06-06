@@ -3,10 +3,7 @@ package com.alejandrorios.condorsports.service.api
 import com.alejandrorios.condorsports.service.network.RetrofitProvider
 import com.alejandrorios.condorsports.service.network.RetrofitProviderImpl
 import com.alejandrorios.condorsports.ui.mainActivity.MainActivityView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.create
 
 class GetTeamsList : MainActivityView.GetTeamsInteractor {
@@ -15,13 +12,18 @@ class GetTeamsList : MainActivityView.GetTeamsInteractor {
         codeLeague: String,
         onFinishedListener: MainActivityView.GetTeamsInteractor.OnFinishedListener
     ) {
+        return getInfoForRepo(codeLeague, onFinishedListener)
+    }
+
+    private fun getInfoForRepo(codeLeague: String,
+                                       onFinishedListener: MainActivityView.GetTeamsInteractor.OnFinishedListener){
         val service: RetrofitProvider = RetrofitProviderImpl.retrofit.create()
 
         CoroutineScope(Dispatchers.IO).launch {
-            val request = service.getTeamByLeague(codeLeague)
+            val response = service.getTeamByLeague(codeLeague)
             withContext(Dispatchers.IO) {
                 try {
-                    val response = request.await()
+
                     if (response.isSuccessful) {
                         response.body()?.let { onFinishedListener.onFinished(it) }
                     } else {
