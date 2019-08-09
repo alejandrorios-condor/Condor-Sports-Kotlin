@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CollapsingToolbarLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -19,16 +18,16 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.alejandrorios.condorsports.R
 import com.alejandrorios.condorsports.adapters.EventsListAdapter
-import com.alejandrorios.condorsports.common.ConfirmationDialog
-import com.alejandrorios.condorsports.common.SpacesItemDecoration
-import com.alejandrorios.condorsports.models.EventsData
-import com.alejandrorios.condorsports.models.TeamData
-import com.alejandrorios.condorsports.service.api.GetEventsList
+import com.alejandrorios.condorsports.ui.BaseActivity
+import com.alejandrorios.condorsports.utils.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.cebroker.domain.models.Events
+import com.cebroker.domain.models.Teams
 import com.google.gson.Gson
+import javax.inject.Inject
 
-class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
+class TeamDetailsActivity : BaseActivity(), TeamDetailsActivityContract.View,
     BottomNavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.collapsing_toolbar)
@@ -58,9 +57,12 @@ class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
     @BindView(R.id.rvEventsList)
     lateinit var rvEventsList: RecyclerView
 
-    var presenter: TeamDetailsPresenter? = null
-    var teamDataInfo: TeamData? = null
+    var teamDataInfo: Teams? = null
     private var dialog: ConfirmationDialog = ConfirmationDialog(this)
+    private var shortAnimTime: Long? = ZERO
+
+    @Inject
+    lateinit var presenter: TeamDetailsActivityContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +70,8 @@ class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
         ButterKnife.bind(this)
 
         setSupportActionBar(toolbar)
+        lifecycle.addObserver(presenter)
+        presenter.bind(this)
 
         try {
             supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -77,15 +81,17 @@ class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
         }
 
         intent.extras.run {
-            teamDataInfo = Gson().run { fromJson(intent.getStringExtra("teamData"), TeamData::class.java) }
-            teamDataInfo.let { collapsing_toolbar.title = it?.strAlternate }
+            teamDataInfo = Gson().run { fromJson(intent.getStringExtra("teamData"), Teams::class.java) }
+            teamDataInfo.let {
+                collapsing_toolbar.title = it?.strAlternate
+                presenter.fetchEventsData(it!!)
+            }
         }
 
-        presenter = TeamDetailsPresenter(applicationContext, this, GetEventsList())
-        presenter!!.fetchEventsData(teamDataInfo)
+        shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
     }
 
-    override fun setupEventsList(eventsData: List<EventsData>) {
+    override fun setupEventsList(eventsData: List<Events>) {
         val resId: Int = R.anim.recycler_animation_falldown
         val animation: LayoutAnimationController = AnimationUtils.loadLayoutAnimation(this, resId)
 
@@ -110,12 +116,11 @@ class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
             layoutManager = LinearLayoutManager(applicationContext)
             layoutAnimation = animation
             adapter = EventsListAdapter(eventsData)
-            addItemDecoration(SpacesItemDecoration(16))
+            addItemDecoration(SpacesItemDecoration(SPACE_DECORATOR))
         }
 
         bottomNavTeam.itemIconTintList = null
         bottomNavTeam.setOnNavigationItemSelectedListener(this)
-        showProgress(false)
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -165,15 +170,24 @@ class TeamDetailsActivity : AppCompatActivity(), TeamDetailsActivityView,
         return true
     }
 
-    override fun showProgress(show: Boolean) {
-        val shortAnimTime: Int = resources.getInteger(android.R.integer.config_shortAnimTime)
-
-        pbEventsList.visibility = if (show) View.VISIBLE else View.GONE
-        pbEventsList.animate().setDuration(shortAnimTime.toLong()).alpha((if (show) 1 else 0).toFloat())
+    override fun showProgress() {
+        pbEventsList.visibility = View.VISIBLE
+        pbEventsList.animate().setDuration(shortAnimTime!!.toLong()).alpha(ONE_ALPHA)
             .setListener(object :
                 AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    pbEventsList.visibility = if (show) View.VISIBLE else View.GONE
+                    pbEventsList.visibility = View.VISIBLE
+                }
+            })
+    }
+
+    override fun hideProgress() {
+        pbEventsList.visibility = View.GONE
+        pbEventsList.animate().setDuration(shortAnimTime!!.toLong()).alpha(ZERO_ALPHA)
+            .setListener(object :
+                AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    pbEventsList.visibility = View.GONE
                 }
             })
     }

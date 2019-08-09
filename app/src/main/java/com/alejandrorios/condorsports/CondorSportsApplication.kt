@@ -1,11 +1,17 @@
 package com.alejandrorios.condorsports
 
-import android.app.Application
-import com.alejandrorios.condorsports.common.RealmDbModule
+import com.cebroker.data.helpers.RealmDbModule
+import com.alejandrorios.condorsports.di.AppComponent
+import com.alejandrorios.condorsports.di.DaggerAppComponent
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
-class CondorSportsApplication : Application(){
+class CondorSportsApplication : DaggerApplication() {
+
+    private var appComponent: AppComponent? = null
+
     override fun onCreate() {
         super.onCreate()
 
@@ -16,4 +22,14 @@ class CondorSportsApplication : Application(){
             .build()
         Realm.setDefaultConfiguration(config)
     }
+
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        val component = DaggerAppComponent.builder()
+            .application(this)
+            .build()
+        appComponent = component
+        component.inject(this)
+        return component
+    }
+
 }

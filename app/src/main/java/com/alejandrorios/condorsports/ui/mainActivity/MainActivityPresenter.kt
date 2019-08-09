@@ -1,44 +1,48 @@
 package com.alejandrorios.condorsports.ui.mainActivity
 
 import com.alejandrorios.condorsports.adapters.TeamListAdapter
-import com.alejandrorios.condorsports.common.RealmManager
-import com.alejandrorios.condorsports.models.Team
-import com.alejandrorios.condorsports.models.TeamData
-import com.alejandrorios.condorsports.service.api.TeamsInteractor
+import com.cebroker.domain.interactor.Interactor
+import com.cebroker.domain.models.CoroutinesContextProvider
+import com.cebroker.domain.models.Teams
 import com.google.gson.Gson
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 
 class MainActivityPresenter(
-    private var mainActivity: MainActivityView?,
-    private val teamsInteractor: TeamsInteractor
-) : MainActivityView.Presenter, TeamsInteractor.OnTeamFinishedListener, TeamListAdapter.Delegate {
+    override val coroutinesContextProvider: CoroutinesContextProvider,
+    private val getTeamsInteractor: Interactor<List<Teams>, String>
+//    private val saveTeamsInteractor: Interactor<Unit, List<Teams>>
+) : MainActivityContract.Presenter, TeamListAdapter.Delegate {
+
+    override val parentJob = Job()
+    override var view: MainActivityContract.View? = null
+    private var teamsList: List<Teams>? = null
 
     override fun getTeamsList(leagueCode: String) {
-        mainActivity?.showProgress(true)
-        teamsInteractor.getTeamsList(leagueCode, this)
-    }
+        view?.showProgress()
 
-    override fun onSuccess(teamList: Team) {
-        mainActivity?.apply {
-            showProgress(false)
-            teamList.data?.let { RealmManager.instance.saveList(it, TeamData::class.java) }
-            teamList.data?.let { setupTeamsList(it) }
+        launchJobOnMainDispatchers {
+            try {
+                teamsList = withContext(coroutinesContextProvider.backgroundContext) {
+                    getTeamsInteractor(leagueCode)
+                }
+
+                teamsList?.let {
+//                    saveTeamsInteractor.invoke(it)
+//                    RealmManager.instance.saveList(it, TeamData::class.java)
+                    view?.hideProgress()
+                    view?.setupTeamsList(it)
+                }
+            } catch (t: Throwable) {
+                view?.hideProgress()
+                t.printStackTrace()
+            }
         }
     }
 
-    override fun onFailure(t: Throwable) {
-        mainActivity?.apply {
-            showProgress(false)
-            showMsg(true)
-        }
-    }
-
-    override fun onTeamClicked(team: TeamData?) {
+    override fun onTeamClicked(team: Teams?) {
         val teamJson: String = Gson().toJson(team)
 
-        mainActivity?.showTeamDetails(teamJson)
-    }
-
-    fun onDestroy() {
-        mainActivity = null
+        view?.showTeamDetails(teamJson)
     }
 }

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.support.v7.widget.Toolbar
@@ -17,14 +16,15 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.alejandrorios.condorsports.R
 import com.alejandrorios.condorsports.adapters.TeamListAdapter
-import com.alejandrorios.condorsports.common.SpacesItemDecoration
-import com.alejandrorios.condorsports.models.TeamData
-import com.alejandrorios.condorsports.service.api.TeamsInteractor
+import com.alejandrorios.condorsports.utils.*
+import com.alejandrorios.condorsports.ui.BaseActivity
 import com.alejandrorios.condorsports.ui.teamDetails.TeamDetailsActivity
+import com.cebroker.domain.models.Teams
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActionSelectedListener {
+class MainActivity : BaseActivity(), MainActivityContract.View, SpeedDialView.OnActionSelectedListener {
 
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
@@ -41,10 +41,13 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
     @BindView(R.id.txtTeamsEmpty)
     lateinit var txtTeamsEmpty: TextView
 
-    private var teamsList: List<TeamData>? = null
-    private var presenter = MainActivityPresenter(this, TeamsInteractor())
+    private var teamsList: List<Teams>? = null
     private var teamAdapter: TeamListAdapter? = null
-    private var decoration = SpacesItemDecoration(16)
+    private var decoration = SpacesItemDecoration(SPACE_DECORATOR)
+    private var shortAnimTime: Long? = ZERO
+
+    @Inject
+    lateinit var presenter: MainActivityContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +55,17 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
         ButterKnife.bind(this)
 
         setSupportActionBar(toolbar)
-
-        presenter!!.getTeamsList(getString(R.string.spanish_league_code))
+        lifecycle.addObserver(presenter)
+        presenter.bind(this)
     }
 
-    override fun setupTeamsList(teams: List<TeamData>) {
+    override fun onResume() {
+        super.onResume()
+        shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        presenter.getTeamsList(getString(R.string.spanish_league_code))
+    }
+
+    override fun setupTeamsList(teams: List<Teams>) {
         teamsList = teams
         val llm = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
         val resId: Int = R.anim.recycler_animation_falldown
@@ -110,23 +119,40 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
         return false
     }
 
-    override fun showProgress(show: Boolean) {
-        val shortAnimTime: Int = resources.getInteger(android.R.integer.config_shortAnimTime)
-
-        rvTeamsList.visibility = if (show) View.GONE else View.VISIBLE
-        rvTeamsList.animate().setDuration(shortAnimTime.toLong()).alpha((if (show) 0 else 1).toFloat())
+    override fun showProgress() {
+        rvTeamsList.visibility = View.GONE
+        rvTeamsList.animate().setDuration(shortAnimTime!!).alpha(ZERO_ALPHA)
             .setListener(object :
                 AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    rvTeamsList.visibility = if (show) View.GONE else View.VISIBLE
+                    rvTeamsList.visibility = View.GONE
                 }
             })
-        pbTeamsList.visibility = if (show) View.VISIBLE else View.GONE
-        pbTeamsList.animate().setDuration(shortAnimTime.toLong()).alpha((if (show) 1 else 0).toFloat())
+        pbTeamsList.visibility = View.VISIBLE
+        pbTeamsList.animate().setDuration(shortAnimTime!!).alpha(ONE_ALPHA)
             .setListener(object :
                 AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    pbTeamsList.visibility = if (show) View.VISIBLE else View.GONE
+                    pbTeamsList.visibility = View.VISIBLE
+                }
+            })
+    }
+
+    override fun hideProgress() {
+        rvTeamsList.visibility = View.VISIBLE
+        rvTeamsList.animate().setDuration(shortAnimTime!!).alpha(ONE_ALPHA)
+            .setListener(object :
+                AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    rvTeamsList.visibility = View.VISIBLE
+                }
+            })
+        pbTeamsList.visibility = View.GONE
+        pbTeamsList.animate().setDuration(shortAnimTime!!).alpha(ZERO_ALPHA)
+            .setListener(object :
+                AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    pbTeamsList.visibility = View.GONE
                 }
             })
     }
@@ -147,14 +173,9 @@ class MainActivity : AppCompatActivity(), MainActivityView, SpeedDialView.OnActi
 
         intent.apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            putExtra("teamData", teamJson)
+            putExtra(TEAM_DATA, teamJson)
         }
 
         applicationContext.startActivity(intent)
-    }
-
-    override fun onDestroy() {
-        presenter?.onDestroy()
-        super.onDestroy()
     }
 }

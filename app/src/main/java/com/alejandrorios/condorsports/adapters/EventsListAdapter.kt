@@ -7,19 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.alejandrorios.condorsports.R
-import com.alejandrorios.condorsports.common.RealmManager
-import com.alejandrorios.condorsports.common.setTopDrawable
-import com.alejandrorios.condorsports.models.EventsData
+import com.alejandrorios.condorsports.utils.DATE_FORMAT
+import com.alejandrorios.condorsports.utils.DATE_FORMAT_ORIGIN
+import com.alejandrorios.condorsports.utils.setTopDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import com.cebroker.domain.models.Events
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EventsListAdapter(private var eventsList: List<EventsData>) :
+class EventsListAdapter(private var eventsList: List<Events>) :
     RecyclerView.Adapter<EventsListAdapter.EventHolder>() {
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.item_event, parent, false)
@@ -35,21 +35,23 @@ class EventsListAdapter(private var eventsList: List<EventsData>) :
 
     inner class EventHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var date = Date()
-        private val sf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        private val sf = SimpleDateFormat(DATE_FORMAT_ORIGIN, Locale.US)
 
         private val homeTeam: TextView = itemView.findViewById(R.id.txtHomeTeam)
         private val awayTeam: TextView = itemView.findViewById(R.id.txtAwayTeam)
         private val eventDate: TextView = itemView.findViewById(R.id.txtEventDate)
 
-        fun bindData(eventItem: EventsData?) {
-            val homeTeamBadge: String? = eventItem?.idHomeTeam?.let { RealmManager.instance.getTeamByName(it) }
-            val awayTeamBadge: String? = eventItem?.idAwayTeam?.let { RealmManager.instance.getTeamByName(it) }
+        fun bindData(eventItem: Events?) {
+//            val homeTeamBadge: String? = eventItem?.idHomeTeam?.let { RealmManager.instance.getTeamBadgeByName(it) }
+//            val awayTeamBadge: String? = eventItem?.idAwayTeam?.let { RealmManager.instance.getTeamBadgeByName(it) }
+            val homeTeamBadge: String? = ""
+            val awayTeamBadge: String? = ""
             homeTeam.text = eventItem?.strHomeTeam
             awayTeam.text = eventItem?.strAwayTeam
 
             try {
                 date = sf.parse(eventItem?.dateEvent)
-                sf.applyPattern("dd MMMM yyyy")
+                sf.applyPattern(DATE_FORMAT)
 
                 eventDate.text = sf.format(date)
 

@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.alejandrorios.condorsports.R
-import com.alejandrorios.condorsports.models.TeamData
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.cebroker.domain.models.Teams
 
-class TeamListAdapter(private var teamsList: List<TeamData>) : Adapter<TeamListAdapter.TeamHolder>() {
+class TeamListAdapter(private var teamsList: List<Teams>) : Adapter<TeamListAdapter.TeamHolder>() {
 
     interface Delegate {
-        fun onTeamClicked(team: TeamData?)
+        fun onTeamClicked(team: Teams?)
     }
 
     var delegate: Delegate? = null
@@ -39,7 +39,7 @@ class TeamListAdapter(private var teamsList: List<TeamData>) : Adapter<TeamListA
         private val teamStadium: TextView = itemView.findViewById(R.id.txtTeamStadium)
         private val lytTeam: View = itemView.findViewById(R.id.lytTeam)
 
-        fun bindData(teamItem: TeamData?) {
+        fun bindData(teamItem: Teams?) {
             teamName.text = teamItem?.strTeam
             teamStadium.text = teamItem?.strStadium
 
