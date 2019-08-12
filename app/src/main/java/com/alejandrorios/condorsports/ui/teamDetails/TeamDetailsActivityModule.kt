@@ -1,8 +1,8 @@
 package com.alejandrorios.condorsports.ui.teamDetails
 
-import com.cebroker.domain.interactor.Interactor
-import com.cebroker.domain.models.CoroutinesContextProvider
-import com.cebroker.domain.models.Events
+import com.alejandrorios.condorsports.domain.interactor.Interactor
+import com.alejandrorios.condorsports.domain.models.CoroutinesContextProvider
+import com.alejandrorios.condorsports.domain.models.Events
 import dagger.Module
 import dagger.Provides
 

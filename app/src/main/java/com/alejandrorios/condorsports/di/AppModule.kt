@@ -1,8 +1,8 @@
 package com.alejandrorios.condorsports.di
 
 import com.alejandrorios.condorsports.BuildConfig
-import com.cebroker.domain.models.Config
-import com.cebroker.domain.models.CoroutinesContextProvider
+import com.alejandrorios.condorsports.domain.models.Config
+import com.alejandrorios.condorsports.domain.models.CoroutinesContextProvider
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.Dispatchers

@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.cebroker.domain.models.Events
+import com.alejandrorios.condorsports.domain.models.Events
 import java.text.SimpleDateFormat
 import java.util.*
 

@@ -22,8 +22,8 @@ import com.alejandrorios.condorsports.ui.BaseActivity
 import com.alejandrorios.condorsports.utils.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.cebroker.domain.models.Events
-import com.cebroker.domain.models.Teams
+import com.alejandrorios.condorsports.domain.models.Events
+import com.alejandrorios.condorsports.domain.models.Teams
 import com.google.gson.Gson
 import javax.inject.Inject
 

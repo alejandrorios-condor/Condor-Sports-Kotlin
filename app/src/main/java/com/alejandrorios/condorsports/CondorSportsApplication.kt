@@ -1,6 +1,6 @@
 package com.alejandrorios.condorsports
 
-import com.cebroker.data.helpers.RealmDbModule
+import com.alejandrorios.condorsports.data.helpers.RealmDbModule
 import com.alejandrorios.condorsports.di.AppComponent
 import com.alejandrorios.condorsports.di.DaggerAppComponent
 import dagger.android.AndroidInjector

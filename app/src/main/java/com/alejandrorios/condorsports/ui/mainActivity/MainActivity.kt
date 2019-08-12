@@ -19,7 +19,7 @@ import com.alejandrorios.condorsports.adapters.TeamListAdapter
 import com.alejandrorios.condorsports.utils.*
 import com.alejandrorios.condorsports.ui.BaseActivity
 import com.alejandrorios.condorsports.ui.teamDetails.TeamDetailsActivity
-import com.cebroker.domain.models.Teams
+import com.alejandrorios.condorsports.domain.models.Teams
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 import javax.inject.Inject

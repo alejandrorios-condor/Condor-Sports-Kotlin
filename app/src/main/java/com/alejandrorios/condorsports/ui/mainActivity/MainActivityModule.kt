@@ -1,10 +1,10 @@
 package com.alejandrorios.condorsports.ui.mainActivity
 
-import com.cebroker.data.helpers.RealmStorageHelper
-import com.cebroker.domain.interactor.Interactor
-import com.cebroker.domain.interactor.SaveTeamsInteractor
-import com.cebroker.domain.models.CoroutinesContextProvider
-import com.cebroker.domain.models.Teams
+import com.alejandrorios.condorsports.data.helpers.RealmStorageHelper
+import com.alejandrorios.condorsports.domain.interactor.Interactor
+import com.alejandrorios.condorsports.domain.interactor.SaveTeamsInteractor
+import com.alejandrorios.condorsports.domain.models.CoroutinesContextProvider
+import com.alejandrorios.condorsports.domain.models.Teams
 import dagger.Module
 import dagger.Provides
 

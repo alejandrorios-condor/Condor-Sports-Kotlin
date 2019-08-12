@@ -3,7 +3,7 @@ package com.alejandrorios.condorsports.ui
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
-import com.cebroker.domain.models.CoroutinesContextProvider
+import com.alejandrorios.condorsports.domain.models.CoroutinesContextProvider
 import kotlinx.coroutines.*
 
 /**

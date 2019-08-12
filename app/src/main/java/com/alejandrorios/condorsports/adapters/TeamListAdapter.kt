@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.alejandrorios.condorsports.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.cebroker.domain.models.Teams
+import com.alejandrorios.condorsports.domain.models.Teams
 
 class TeamListAdapter(private var teamsList: List<Teams>) : Adapter<TeamListAdapter.TeamHolder>() {
 
