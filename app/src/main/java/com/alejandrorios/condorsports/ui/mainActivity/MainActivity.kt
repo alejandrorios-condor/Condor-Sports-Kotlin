@@ -66,10 +66,12 @@ class MainActivity : BaseActivity(), MainActivityContract.View, SpeedDialView.On
     }
 
     override fun setupTeamsList(teams: List<Teams>) {
-        teamsList = teams
         val llm = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
         val resId: Int = R.anim.recycler_animation_falldown
         val animation: LayoutAnimationController = AnimationUtils.loadLayoutAnimation(this, resId)
+
+        rvTeamsList.removeItemDecoration(decoration)
+        teamsList = teams
 
         llm.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         teamAdapter = TeamListAdapter(teamsList!!)
