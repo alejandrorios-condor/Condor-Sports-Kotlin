@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('clean') {
       steps {
-        sh './gradlew clean --stacktrace'
+        sh './gradlew clean'
       }
     }
     stage('Unit tests Data') {
