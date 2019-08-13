@@ -1,11 +1,11 @@
 package com.alejandrorios.condorsports.di
 
-import com.cebroker.data.di.RepositoryModuleData
-import com.cebroker.domain.interactor.*
-import com.cebroker.domain.models.Events
-import com.cebroker.domain.models.Teams
-import com.cebroker.domain.repositories.RealmStorageRepository
-import com.cebroker.domain.repositories.TeamsRepository
+import com.alejandrorios.condorsports.data.di.RepositoryModuleData
+import com.alejandrorios.condorsports.domain.interactor.*
+import com.alejandrorios.condorsports.domain.models.Events
+import com.alejandrorios.condorsports.domain.models.Teams
+import com.alejandrorios.condorsports.domain.repositories.RealmStorageRepository
+import com.alejandrorios.condorsports.domain.repositories.TeamsRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

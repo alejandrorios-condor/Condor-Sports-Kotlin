@@ -3,7 +3,7 @@ package com.alejandrorios.condorsports.ui.mainActivity
 import com.alejandrorios.condorsports.adapters.TeamListAdapter
 import com.alejandrorios.condorsports.ui.BaseCoroutinePresenter
 import com.alejandrorios.condorsports.ui.BaseView
-import com.cebroker.domain.models.Teams
+import com.alejandrorios.condorsports.domain.models.Teams
 
 interface MainActivityContract {
 
